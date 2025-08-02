@@ -19,7 +19,7 @@ int main(){
     int minIndex = -1;                                // // store the index of min value                               
     for(int i=0; i<size; i++){
         if(nums[i] < min){                            // whenever array element lesser than min , update min variable with the array element.
-            min = nums[i];
+            min = nums[i];                            // also we can use min = min(num[i], min)
             minIndex = i;                             // update the index at which min value occurs.
         }
     }

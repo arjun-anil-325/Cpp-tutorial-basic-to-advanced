@@ -19,7 +19,7 @@ int main(){
     int maxIndex = -1;                                // store the index of max value                               
     for(int i=0; i<size; i++){
         if(nums[i] > max){                            // whenever array element greater than max , update max variable with the array element.
-            max = nums[i];
+            max = nums[i];                            // also we can use max = max(num[i],max)
             maxIndex = i;                             // update the index at which max value occurs.
         }
     }
