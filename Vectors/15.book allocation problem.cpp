@@ -2,92 +2,108 @@
 #include <vector>
 using namespace std;
 
-// Function to check if we can allocate books such that no student gets more than 'maxAllowedPages' pages.
+/*
+   Function: isValidMid
+   --------------------
+   Checks if it is possible to allocate books among 'm' students
+   such that no student gets more than 'maxAllowedPages' pages.
 
+   Parameters:
+       arr - vector of pages in each book
+       n   - number of books
+       m   - number of students
+       maxAllowedPages - maximum pages a student can get (our guess)
+
+   Returns:
+       true  -> allocation is possible
+       false -> allocation not possible
+*/
 bool isValidMid(vector<int> &arr, int n, int m, int maxAllowedPages) {
-    
-    int stud = 1;       // Number of students allocated so far (start with 1st student)
-    int pages = 0;      // Pages allocated to the current student
+    int stud = 1;   // number of students allocated so far
+    int pages = 0;  // pages allocated to current student
 
     for (int i = 0; i < n; i++) {
-
-        // If a single book has more pages than maxAllowedPages, then it's impossible to allocate — return false immediately
-        if (arr[i] > maxAllowedPages) 
+        // If a single book has more pages than maxAllowedPages,
+        // then it's impossible to allocate → return false
+        if (arr[i] > maxAllowedPages)
             return false;
 
-        // If adding this book does not exceed the max allowed pages for a student
+        // If current student can take this book without exceeding limit
         if (pages + arr[i] <= maxAllowedPages) {
-            pages += arr[i];  // Give this book to the current student
+            pages += arr[i];  // assign book to same student
         } 
         else {
-            // If adding this book exceeds the limit, assign it to a new student
-            stud++;           
-            pages = arr[i];   // Start counting pages for the new student
+            // Otherwise, allocate to next student
+            stud++;
+            pages = arr[i];   // start counting pages for new student
         }
     }
 
-    // If the total number of students required is within the allowed limit (m),
-    // then this allocation is possible
-    if(stud <= m){
-        return true;
-    }
-    else{
-        return false;
-    }
+    // If we required 'stud' students <= m allowed students, then it's valid
+    return (stud <= m);
 }
 
+/*
+   Function: allocateBooks
+   -----------------------
+   Finds the minimum possible maximum number of pages that can be
+   allocated to 'm' students such that:
+      1. Books are given in the same order (no rearranging).
+      2. No book is split between students.
+      3. The maximum pages assigned to any student is minimized.
 
-// Function to find the minimum possible maximum number of pages that can be allocated to 'm' students such that:
-// 1. Books are allocated in order (no rearranging)
-// 2. No book is divided between students
-// 3. We want to minimize the maximum pages any student gets
-
+   Idea:
+     - Use Binary Search on Answer.
+     - Search range = [0, total pages in all books].
+     - For each mid, check feasibility with isValidMid().
+     - If feasible, save it and try smaller (minimize further).
+     - If not feasible, try larger values.
+*/
 int allocateBooks(vector<int> &arr, int n, int m) {
-    
-    int sum = 0; // Total pages of all books
-    
-    // Calculate total sum of pages. This sum will be the upper bound for binary search
+    int sum = 0;  // total pages of all books
     for (int i = 0; i < n; i++) {
         sum += arr[i];
     }
 
-    int st = 0;       // Lower bound of search (min possible max pages)
-    int end = sum;    // Upper bound of search (max possible max pages)
-    int ans = -1;     // Stores the final answer
+    int st = 0;       // lower bound of search
+    int end = sum;    // upper bound of search
+    int ans = -1;     // will store final answer
 
-    // If there are more students than books, allocation is impossible
+    // If there are more students than books → allocation impossible
     if (m > n) return -1;
 
-    // Binary Search for the minimum possible 'max pages'
+    // Binary Search
     while (st <= end) {
-        
-        int mid = st + (end - st) / 2; // Midpoint of current range
-
-        // Check if we can allocate books such that 
-        // no student gets more than 'mid' pages
+        int mid = st + (end - st) / 2; // candidate max pages
 
         if (isValidMid(arr, n, m, mid)) {
-            ans = mid;       // This is a valid allocation
-            end = mid - 1;   // Try to find an even smaller max pages value
-        }
-        else {
-            st = mid + 1;    // Increase lower bound since 'mid' was too small
+            ans = mid;       // valid allocation
+            end = mid - 1;   // try smaller max pages
+        } else {
+            st = mid + 1;    // not valid → increase pages
         }
     }
-
-    return ans; // Minimum possible max pages
+    return ans; // minimum possible maximum pages
 }
 
-
+/*
+   Main function:
+   --------------
+   Example:
+     Books = {2, 1, 3, 4}
+     Students = 2
+   Expected output: 6
+   Explanation:
+     - Allocate {2,1,3} → 6 pages
+     - Allocate {4}     → 4 pages
+     Max = 6 (minimized)
+*/
 int main() {
-
-    // Example test case
-    vector<int> arr = {2,1,3,4};       // Pages in each book
-    int n = arr.size();                 // Number of books
-    int m = 2;                          // Number of students
+    vector<int> arr = {2, 1, 3, 4}; // pages in each book
+    int n = arr.size();             // number of books
+    int m = 2;                      // number of students
 
     cout << "Minimum pages : " << allocateBooks(arr, n, m) << endl;
-
     return 0;
 }
 
