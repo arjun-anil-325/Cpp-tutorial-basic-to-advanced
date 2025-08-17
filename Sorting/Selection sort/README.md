@@ -66,6 +66,7 @@ Process visualization:
 ### Input
 
 5
+
 64 25 12 22 11
 
 
